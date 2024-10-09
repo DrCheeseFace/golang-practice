@@ -25,7 +25,6 @@ var (
 	postsMu sync.Mutex
 )
 
-
 func handleGetPosts(w http.ResponseWriter, r *http.Request) {
 	postsMu.Lock()
 	defer postsMu.Unlock()
@@ -45,13 +44,15 @@ func handleGetPost(w http.ResponseWriter, r *http.Request) {
 	idstr := chi.URLParam(r, "id")
 	id, err := strconv.Atoi(idstr)
 	if err != nil {
-		http.Error(w, "invalid post id", http.StatusBadRequest)
+		w.WriteHeader(400)
+		w.Write([]byte("invalid post id"))
 		return
 	}
 
 	p, ok := posts[id]
 	if !ok {
-		http.Error(w, "post not found stupid ass id", http.StatusNotFound)
+		w.WriteHeader(404)
+		w.Write([]byte("post not found stupid ass id"))
 		return
 	}
 
@@ -62,11 +63,15 @@ func handlePostPost(w http.ResponseWriter, r *http.Request) {
 	var p Post
 	body, err := io.ReadAll(r.Body)
 	if err != nil {
-		http.Error(w, "error reading request body", http.StatusInternalServerError)
+		w.WriteHeader(500)
+		w.Write([]byte("error reading request body"))
+		return
 	}
 
 	if err := json.Unmarshal(body, &p); err != nil {
-		http.Error(w, "error parsing request body", http.StatusBadRequest)
+		w.WriteHeader(400)
+		w.Write([]byte("error parsing request body"))
+		return
 	}
 	postsMu.Lock()
 	defer postsMu.Unlock()
@@ -88,13 +93,16 @@ func handleDeletePost(w http.ResponseWriter, r *http.Request) {
 	idstr := chi.URLParam(r, "id")
 	id, err := strconv.Atoi(idstr)
 	if err != nil {
-		http.Error(w, "invalid post id", http.StatusBadRequest)
+		w.WriteHeader(400)
+		w.Write([]byte("invalid post id"))
 		return
 	}
 
 	_, ok := posts[id]
 	if !ok {
-		http.Error(w, "post not found", http.StatusNotFound)
+		w.WriteHeader(404)
+		w.Write([]byte("post not found"))
+		return
 	}
 
 	delete(posts, id)
