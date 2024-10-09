@@ -14,9 +14,10 @@ import (
 
 // init stuff for siming db
 type Post struct {
-	Id   int       `json:"id"`
-	Body string    `json:"body"`
-	Time time.Time `json:"time"`
+	Id           int       `json:"id"`
+	Body         string    `json:"body"`
+	FirstCreated time.Time `json:"firstcreated"`
+	LastUpdated  time.Time `json:"updatedtime"`
 }
 
 var (
@@ -61,23 +62,24 @@ func handleGetPost(w http.ResponseWriter, r *http.Request) {
 }
 func handlePostPost(w http.ResponseWriter, r *http.Request) {
 	var p Post
-	body, err := io.ReadAll(r.Body)
-	if err != nil {
-		w.WriteHeader(500)
-		w.Write([]byte("error reading request body"))
-		return
-	}
-
+	body, _:= io.ReadAll(r.Body)
 	if err := json.Unmarshal(body, &p); err != nil {
 		w.WriteHeader(400)
 		w.Write([]byte("error parsing request body"))
 		return
+
 	}
+    if len(p.Body) == 0 {
+        w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte("empty body"))
+		return
+    }
 	postsMu.Lock()
 	defer postsMu.Unlock()
 
+
 	p.Id = nextID
-	p.Time = time.Now()
+	p.FirstCreated = time.Now()
 	nextID++
 	posts[p.Id] = p
 
@@ -107,7 +109,45 @@ func handleDeletePost(w http.ResponseWriter, r *http.Request) {
 
 	delete(posts, id)
 	w.WriteHeader(http.StatusOK)
+}
 
+func handlePutPost(w http.ResponseWriter, r *http.Request) {
+	idstr := chi.URLParam(r, "id")
+	id, err := strconv.Atoi(idstr)
+	if err != nil {
+		w.WriteHeader(400)
+		w.Write([]byte("invalid post id"))
+		return
+	}
+
+	body, err := io.ReadAll(r.Body)
+	if err != nil {
+		w.WriteHeader(500)
+		w.Write([]byte("error reading request body"))
+		return
+	}
+
+	postsMu.Lock()
+	defer postsMu.Unlock()
+
+	if post, ok := posts[id]; ok {
+		post.LastUpdated = time.Now()
+		if err := json.Unmarshal(body, &post); err != nil {
+			w.WriteHeader(400)
+			fmt.Println(err)
+			w.Write([]byte("error parsing request body"))
+			return
+		}
+		posts[id] = post
+	} else {
+		w.WriteHeader(404)
+		w.Write([]byte("post does not exist"))
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusCreated)
+	json.NewEncoder(w).Encode(posts[id])
 }
 
 func main() {
@@ -118,6 +158,7 @@ func main() {
 	})
 
 	r.Post("/posts", handlePostPost)
+	r.Put("/posts/{id}", handlePutPost)
 	r.Get("/posts/{id}", handleGetPost)
 	r.Get("/posts", handleGetPosts)
 	r.Delete("/posts/{id}", handleDeletePost)
