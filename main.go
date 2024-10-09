@@ -3,8 +3,9 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/chi/v5/middleware"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"strconv"
 	"sync"
@@ -24,36 +25,9 @@ var (
 	postsMu sync.Mutex
 )
 
-func postsHandler(w http.ResponseWriter, r *http.Request) {
-	switch r.Method {
-	case "GET":
-		handleGetPosts(w, r)
-	case "POST":
-		handlePostPosts(w, r)
-	default:
-		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
-	}
-}
-
-func postHandler(w http.ResponseWriter, r *http.Request) {
-	id, err := strconv.Atoi(r.URL.Path[len("/posts/"):])
-	if err != nil {
-		http.Error(w, "invalid post id", http.StatusBadRequest)
-		return
-	}
-	switch r.Method {
-	case "GET":
-		handleGetPost(w, r, id)
-	case "DELETE":
-		handleDeletePost(w, r, id)
-	default:
-		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
-	}
-}
 
 func handleGetPosts(w http.ResponseWriter, r *http.Request) {
 	postsMu.Lock()
-	// this works so romantically
 	defer postsMu.Unlock()
 
 	ps := make([]Post, 0, len(posts))
@@ -63,41 +37,42 @@ func handleGetPosts(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(ps)
-}
 
-func handleGetPost(w http.ResponseWriter, r *http.Request, id int) {
+}
+func handleGetPost(w http.ResponseWriter, r *http.Request) {
 	postsMu.Lock()
 	defer postsMu.Unlock()
+	idstr := chi.URLParam(r, "id")
+	id, err := strconv.Atoi(idstr)
+	if err != nil {
+		http.Error(w, "invalid post id", http.StatusBadRequest)
+		return
+	}
 
 	p, ok := posts[id]
 	if !ok {
 		http.Error(w, "post not found stupid ass id", http.StatusNotFound)
 		return
 	}
+
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(p)
 }
-
-func handlePostPosts(w http.ResponseWriter, r *http.Request) {
+func handlePostPost(w http.ResponseWriter, r *http.Request) {
 	var p Post
-
 	body, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		http.Error(w, "error reading request body", http.StatusInternalServerError)
-		return
 	}
 
 	if err := json.Unmarshal(body, &p); err != nil {
 		http.Error(w, "error parsing request body", http.StatusBadRequest)
-		return
 	}
-
 	postsMu.Lock()
 	defer postsMu.Unlock()
 
 	p.Id = nextID
 	p.Time = time.Now()
-
 	nextID++
 	posts[p.Id] = p
 
@@ -106,9 +81,16 @@ func handlePostPosts(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(p)
 }
 
-func handleDeletePost(w http.ResponseWriter, r *http.Request, id int) {
+func handleDeletePost(w http.ResponseWriter, r *http.Request) {
 	postsMu.Lock()
 	defer postsMu.Unlock()
+
+	idstr := chi.URLParam(r, "id")
+	id, err := strconv.Atoi(idstr)
+	if err != nil {
+		http.Error(w, "invalid post id", http.StatusBadRequest)
+		return
+	}
 
 	_, ok := posts[id]
 	if !ok {
@@ -121,11 +103,18 @@ func handleDeletePost(w http.ResponseWriter, r *http.Request, id int) {
 }
 
 func main() {
-	//confusing naming here but postHandler does the id stuff (get specific post and delete post)
-	// and postsHandler does the get and post
-	http.HandleFunc("/posts", postsHandler)
-	http.HandleFunc("/posts/", postHandler)
+	r := chi.NewRouter()
+	r.Use(middleware.Logger)
+	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
+		w.Write([]byte("welcome"))
+	})
 
-	fmt.Println("server running on http://localhost:8080")
-	log.Fatal(http.ListenAndServe(":8080", nil))
+	r.Post("/posts", handlePostPost)
+	r.Get("/posts/{id}", handleGetPost)
+	r.Get("/posts", handleGetPosts)
+	r.Delete("/posts/{id}", handleDeletePost)
+
+	fmt.Println("listening on localhost:8008")
+	http.ListenAndServe(":8080", r)
+
 }
