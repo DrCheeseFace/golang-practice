@@ -45,14 +45,14 @@ func handleGetPost(w http.ResponseWriter, r *http.Request) {
 	idstr := chi.URLParam(r, "id")
 	id, err := strconv.Atoi(idstr)
 	if err != nil {
-		w.WriteHeader(400)
+		w.WriteHeader(http.StatusBadRequest)
 		w.Write([]byte("invalid post id"))
 		return
 	}
 
 	p, ok := posts[id]
 	if !ok {
-		w.WriteHeader(404)
+		w.WriteHeader(http.StatusNotFound)
 		w.Write([]byte("post not found stupid ass id"))
 		return
 	}
@@ -62,21 +62,20 @@ func handleGetPost(w http.ResponseWriter, r *http.Request) {
 }
 func handlePostPost(w http.ResponseWriter, r *http.Request) {
 	var p Post
-	body, _:= io.ReadAll(r.Body)
+	body, _ := io.ReadAll(r.Body)
 	if err := json.Unmarshal(body, &p); err != nil {
-		w.WriteHeader(400)
+		w.WriteHeader(http.StatusBadRequest)
 		w.Write([]byte("error parsing request body"))
 		return
 
 	}
-    if len(p.Body) == 0 {
-        w.WriteHeader(http.StatusBadRequest)
+	if len(p.Body) == 0 {
+		w.WriteHeader(http.StatusBadRequest)
 		w.Write([]byte("empty body"))
 		return
-    }
+	}
 	postsMu.Lock()
 	defer postsMu.Unlock()
-
 
 	p.Id = nextID
 	p.FirstCreated = time.Now()
@@ -95,14 +94,14 @@ func handleDeletePost(w http.ResponseWriter, r *http.Request) {
 	idstr := chi.URLParam(r, "id")
 	id, err := strconv.Atoi(idstr)
 	if err != nil {
-		w.WriteHeader(400)
+		w.WriteHeader(http.StatusBadRequest)
 		w.Write([]byte("invalid post id"))
 		return
 	}
 
 	_, ok := posts[id]
 	if !ok {
-		w.WriteHeader(404)
+		w.WriteHeader(http.StatusNotFound)
 		w.Write([]byte("post not found"))
 		return
 	}
@@ -115,14 +114,14 @@ func handlePutPost(w http.ResponseWriter, r *http.Request) {
 	idstr := chi.URLParam(r, "id")
 	id, err := strconv.Atoi(idstr)
 	if err != nil {
-		w.WriteHeader(400)
+		w.WriteHeader(http.StatusBadRequest)
 		w.Write([]byte("invalid post id"))
 		return
 	}
 
 	body, err := io.ReadAll(r.Body)
 	if err != nil {
-		w.WriteHeader(500)
+		w.WriteHeader(http.StatusInternalServerError)
 		w.Write([]byte("error reading request body"))
 		return
 	}
@@ -133,14 +132,14 @@ func handlePutPost(w http.ResponseWriter, r *http.Request) {
 	if post, ok := posts[id]; ok {
 		post.LastUpdated = time.Now()
 		if err := json.Unmarshal(body, &post); err != nil {
-			w.WriteHeader(400)
+			w.WriteHeader(http.StatusBadRequest)
 			fmt.Println(err)
 			w.Write([]byte("error parsing request body"))
 			return
 		}
 		posts[id] = post
 	} else {
-		w.WriteHeader(404)
+		w.WriteHeader(http.StatusNotFound)
 		w.Write([]byte("post does not exist"))
 		return
 	}
