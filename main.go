@@ -49,15 +49,15 @@ func handleGetPost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	rows := []Post{}
-	db.Select(&rows, "SELECT * FROM posts WHERE id=$1", id)
-	if len(rows) != 1 {
+	post := Post{}
+	err = db.Get(&post, "SELECT * FROM posts WHERE id=$1", id)
+	if err != nil {
 		w.WriteHeader(http.StatusNotFound)
-		w.Write([]byte("post not found stupid ass id"))
+		w.Write([]byte("post not found"))
 		return
 	}
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(rows)
+	json.NewEncoder(w).Encode(post)
 }
 func handlePostPost(w http.ResponseWriter, r *http.Request) {
 	var p Post
