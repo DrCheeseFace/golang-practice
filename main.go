@@ -54,15 +54,15 @@ func handleGetPost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	p, ok := posts[id]
-	if !ok {
+    rows := []Post{}
+    db.Select(&rows, "SELECT * FROM posts WHERE id=$1", id)
+	if len(rows) != 1{
 		w.WriteHeader(http.StatusNotFound)
 		w.Write([]byte("post not found stupid ass id"))
 		return
 	}
-
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(p)
+	json.NewEncoder(w).Encode(rows)
 }
 func handlePostPost(w http.ResponseWriter, r *http.Request) {
 	var p Post
