@@ -7,7 +7,6 @@ import (
 	"log"
 	"net/http"
 	"strconv"
-	"sync"
 	"time"
 
 	"github.com/go-chi/chi/v5"
@@ -24,11 +23,6 @@ type Post struct {
 	LastUpdated  time.Time `db:"lastupdated" json:"lastupdated"`
 }
 
-var (
-	posts   = make(map[int]Post)
-	nextID  = 1
-	postsMu sync.Mutex
-)
 var schema = `
 CREATE TABLE IF NOT EXISTS posts (
     Id SERIAL PRIMARY KEY, 
