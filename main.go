@@ -5,7 +5,10 @@ import (
 	"fmt"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
+	"github.com/jmoiron/sqlx"
+	_ "github.com/lib/pq"
 	"io"
+	"log"
 	"net/http"
 	"strconv"
 	"sync"
@@ -14,10 +17,10 @@ import (
 
 // init stuff for siming db
 type Post struct {
-	Id           int       `json:"id"`
+	Id           int       `db:"id" json:"id"`
 	Body         string    `json:"body"`
-	FirstCreated time.Time `json:"firstcreated"`
-	LastUpdated  time.Time `json:"updatedtime"`
+	FirstCreated time.Time `db:"firstcreated" json:"firstcreated"`
+	LastUpdated  time.Time `db:"lastupdated" json:"updatedtime"`
 }
 
 var (
@@ -25,23 +28,24 @@ var (
 	nextID  = 1
 	postsMu sync.Mutex
 )
+var schema = `
+CREATE TABLE IF NOT EXISTS posts (
+    Id SERIAL PRIMARY KEY, 
+    Body TEXT NOT NULL,
+    FirstCreated TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    LastUpdated TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+`
+var db *sqlx.DB
 
 func handleGetPosts(w http.ResponseWriter, r *http.Request) {
-	postsMu.Lock()
-	defer postsMu.Unlock()
-
-	ps := make([]Post, 0, len(posts))
-	for _, p := range posts {
-		ps = append(ps, p)
-	}
-
+    rows := []Post{}
+    db.Select(&rows, "SELECT * FROM posts")
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(ps)
+	json.NewEncoder(w).Encode(rows)
 
 }
 func handleGetPost(w http.ResponseWriter, r *http.Request) {
-	postsMu.Lock()
-	defer postsMu.Unlock()
 	idstr := chi.URLParam(r, "id")
 	id, err := strconv.Atoi(idstr)
 	if err != nil {
@@ -74,13 +78,15 @@ func handlePostPost(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("empty body"))
 		return
 	}
-	postsMu.Lock()
-	defer postsMu.Unlock()
-
-	p.Id = nextID
 	p.FirstCreated = time.Now()
-	nextID++
-	posts[p.Id] = p
+	p.LastUpdated = time.Now()
+
+	query := "INSERT INTO posts (Body, FirstCreated, LastUpdated) VALUES (:body, :firstcreated, :lastupdated)"
+	_, err := db.NamedExec(query, p)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte("something wrong with adding post to post table"))
+	}
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated)
@@ -149,20 +155,36 @@ func handlePutPost(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(posts[id])
 }
 
-func main() {
-	r := chi.NewRouter()
-	r.Use(middleware.Logger)
-	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte("welcome"))
-	})
+func dbinit() {
+	var err error
+	db, err = sqlx.Connect("postgres", "user=postgres dbname=postgres sslmode=disable password=pass")
+	if err != nil {
+		log.Fatalln(err)
+	}
+	db.MustExec(schema)
+	// tx := db.MustBegin()
+	// tx.MustExec("INSERT INTO posts ( Body, FirstCreated, LastUpdated) VALUES ($1, $2, $3)", "first entry body", time.Now(), time.Now())
+	// tx.MustExec("INSERT INTO posts ( Body, FirstCreated, LastUpdated) VALUES ($1, $2, $3)", "second entry body", time.Now(), time.Now())
+	// tx.MustExec("INSERT INTO posts ( Body, FirstCreated, LastUpdated) VALUES ($1, $2, $3)", "third entry body", time.Now(), time.Now())
+	// tx.Commit()
 
+}
+
+func main() {
+
+	dbinit()
+	r := chi.NewRouter()
+
+	r.Use(middleware.Logger)
+
+	r.Get("/", func(w http.ResponseWriter, r *http.Request) { w.Write([]byte("welcome")) })
 	r.Post("/posts", handlePostPost)
 	r.Put("/posts/{id}", handlePutPost)
 	r.Get("/posts/{id}", handleGetPost)
 	r.Get("/posts", handleGetPosts)
 	r.Delete("/posts/{id}", handleDeletePost)
 
-	fmt.Println("listening on localhost:8008")
+	fmt.Println("listening on localhost:8080")
 	http.ListenAndServe(":8080", r)
 
 }
