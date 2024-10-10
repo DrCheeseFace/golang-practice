@@ -100,7 +100,6 @@ func handleDeletePost(w http.ResponseWriter, r *http.Request) {
 	post := Post{}
 	err = db.Get(&post, "SELECT FROM posts WHERE id=$1", id)
 	if err != nil {
-		fmt.Println(err)
 		w.WriteHeader(http.StatusNotFound)
 		w.Write([]byte("post not found"))
 		return
@@ -133,20 +132,18 @@ func handlePutPost(w http.ResponseWriter, r *http.Request) {
 	post := Post{}
 	err = db.Get(&post, "SELECT FROM posts WHERE id=$1", id)
 	if err != nil {
-		fmt.Println(err)
 		w.WriteHeader(http.StatusNotFound)
 		w.Write([]byte("post not found"))
 		return
 	}
 	if err := json.Unmarshal(body, &post); err != nil {
 		w.WriteHeader(http.StatusBadRequest)
-		fmt.Println(err)
 		w.Write([]byte("error parsing request body"))
 		return
 	}
 	post.LastUpdated = time.Now()
 
-    db.NamedExec("UPDATE posts SET body=:body, lastupdated=:lastupdated WHERE :id=:id", post)
+	db.NamedExec("UPDATE posts SET body=:body, lastupdated=:lastupdated WHERE :id=:id", post)
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated)
