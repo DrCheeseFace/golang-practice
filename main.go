@@ -3,16 +3,17 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/go-chi/chi/v5"
-	"github.com/go-chi/chi/v5/middleware"
-	"github.com/jmoiron/sqlx"
-	_ "github.com/lib/pq"
 	"io"
 	"log"
 	"net/http"
 	"strconv"
 	"sync"
 	"time"
+
+	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/chi/v5/middleware"
+	"github.com/jmoiron/sqlx"
+	_ "github.com/lib/pq"
 )
 
 // init stuff for siming db
@@ -39,8 +40,8 @@ CREATE TABLE IF NOT EXISTS posts (
 var db *sqlx.DB
 
 func handleGetPosts(w http.ResponseWriter, r *http.Request) {
-    rows := []Post{}
-    db.Select(&rows, "SELECT * FROM posts")
+	rows := []Post{}
+	db.Select(&rows, "SELECT * FROM posts")
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(rows)
 
@@ -54,9 +55,9 @@ func handleGetPost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-    rows := []Post{}
-    db.Select(&rows, "SELECT * FROM posts WHERE id=$1", id)
-	if len(rows) != 1{
+	rows := []Post{}
+	db.Select(&rows, "SELECT * FROM posts WHERE id=$1", id)
+	if len(rows) != 1 {
 		w.WriteHeader(http.StatusNotFound)
 		w.Write([]byte("post not found stupid ass id"))
 		return
@@ -94,9 +95,6 @@ func handlePostPost(w http.ResponseWriter, r *http.Request) {
 }
 
 func handleDeletePost(w http.ResponseWriter, r *http.Request) {
-	postsMu.Lock()
-	defer postsMu.Unlock()
-
 	idstr := chi.URLParam(r, "id")
 	id, err := strconv.Atoi(idstr)
 	if err != nil {
@@ -105,14 +103,20 @@ func handleDeletePost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_, ok := posts[id]
-	if !ok {
+	post := Post{}
+	err = db.Get(&post, "SELECT FROM posts WHERE id=$1", id)
+	if err != nil {
+		fmt.Println(err)
 		w.WriteHeader(http.StatusNotFound)
 		w.Write([]byte("post not found"))
 		return
 	}
 
-	delete(posts, id)
+	_, err = db.Exec("DELETE FROM posts WHERE id=$1", id)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte("something went wrong with deleting post"))
+	}
 	w.WriteHeader(http.StatusOK)
 }
 
