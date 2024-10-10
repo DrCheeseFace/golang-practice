@@ -19,9 +19,9 @@ import (
 // init stuff for siming db
 type Post struct {
 	Id           int       `db:"id" json:"id"`
-	Body         string    `json:"body"`
+	Body         string    `db:"body" json:"body"`
 	FirstCreated time.Time `db:"firstcreated" json:"firstcreated"`
-	LastUpdated  time.Time `db:"lastupdated" json:"updatedtime"`
+	LastUpdated  time.Time `db:"lastupdated" json:"lastupdated"`
 }
 
 var (
@@ -136,27 +136,27 @@ func handlePutPost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	postsMu.Lock()
-	defer postsMu.Unlock()
-
-	if post, ok := posts[id]; ok {
-		post.LastUpdated = time.Now()
-		if err := json.Unmarshal(body, &post); err != nil {
-			w.WriteHeader(http.StatusBadRequest)
-			fmt.Println(err)
-			w.Write([]byte("error parsing request body"))
-			return
-		}
-		posts[id] = post
-	} else {
+	post := Post{}
+	err = db.Get(&post, "SELECT FROM posts WHERE id=$1", id)
+	if err != nil {
+		fmt.Println(err)
 		w.WriteHeader(http.StatusNotFound)
-		w.Write([]byte("post does not exist"))
+		w.Write([]byte("post not found"))
 		return
 	}
+	if err := json.Unmarshal(body, &post); err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		fmt.Println(err)
+		w.Write([]byte("error parsing request body"))
+		return
+	}
+	post.LastUpdated = time.Now()
+
+    db.NamedExec("UPDATE posts SET body=:body, lastupdated=:lastupdated WHERE :id=:id", post)
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated)
-	json.NewEncoder(w).Encode(posts[id])
+	json.NewEncoder(w).Encode(post)
 }
 
 func dbinit() {
