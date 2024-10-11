@@ -65,12 +65,19 @@ func (h postHandler) CreatePostHandler(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("empty body"))
 		return
 	}
-	err := h.postSvc.AddPost(p)
+	id, err := h.postSvc.AddPost(p)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		w.Write([]byte("failed to add a post"))
 		return
 	}
+
+    p, err = h.postSvc.GetPost(int(id))
+    if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte("failed to retreive added post"))
+		return
+    }
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated)

@@ -11,7 +11,7 @@ type (
 	PostService interface {
 		GetPosts() ([]model.Post, error)
 		GetPost(id int) (model.Post, error)
-		AddPost(post model.Post) error
+		AddPost(post model.Post) (int64, error)
 		UpdatePost(id int, post model.Post) error
 		DeletePost(id int) error
 	}
@@ -35,10 +35,16 @@ func (svc postSvc) GetPost(id int) (model.Post, error) {
 	return post, err
 }
 
-func (svc postSvc) AddPost(p model.Post) error {
-	query := "INSERT INTO posts (Body) VALUES (:body)"
-	_, err := database.Db.NamedExec(query, p)
-	return err
+func (svc postSvc) AddPost(p model.Post) (int64, error) {
+	query := "INSERT INTO posts (body) VALUES ($1) RETURNING id"
+	lastInsertId := 0
+	var err = database.Db.QueryRow(query, p.Body).Scan(&lastInsertId)
+	if err != nil {
+        fmt.Println(err)
+		return 0, err
+	}
+
+	return int64(lastInsertId), nil
 }
 
 func (svc postSvc) UpdatePost(id int, post model.Post) error {
@@ -56,9 +62,9 @@ func (svc postSvc) UpdatePost(id int, post model.Post) error {
 
 func (svc postSvc) DeletePost(id int) error {
 	res, err := database.Db.Exec("DELETE FROM posts WHERE id=$1", id)
-    if err != nil {
-        return err
-    }
+	if err != nil {
+		return err
+	}
 	var numRows int64
 	numRows, err = res.RowsAffected()
 	if numRows == 0 {
