@@ -1,0 +1,5 @@
+db:
+  name: postgres
+  password: ${DATABASE_PASSWORD}
+  username: ${DATABASE_USERNAME}
+
