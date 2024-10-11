@@ -1,9 +1,8 @@
 package configuration
 
 import (
-	"fmt"
-
 	"github.com/a8m/envsubst"
+	"github.com/joho/godotenv"
 	"gopkg.in/yaml.v3"
 )
 
@@ -22,12 +21,16 @@ type (
 )
 
 func init() {
+	err := godotenv.Load()
+	if err != nil {
+		panic(err)
+	}
 	bytes, err := envsubst.ReadFile("./config.yaml")
 	if err != nil {
 		panic(err)
 	}
+
 	err = yaml.Unmarshal(bytes, &State)
-    fmt.Println(State)
 	if err != nil {
 		panic(err)
 	}
