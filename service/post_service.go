@@ -2,7 +2,6 @@ package service
 
 import (
 	"database/sql"
-	"fmt"
 	"go-server/database"
 	"go-server/model"
 )
@@ -11,7 +10,7 @@ type (
 	PostService interface {
 		GetPosts() ([]model.Post, error)
 		GetPost(id int) (model.Post, error)
-		AddPost(post model.Post) (int64, error)
+		AddPost(post model.Post) (int, error)
 		UpdatePost(id int, post model.Post) error
 		DeletePost(id int) error
 	}
@@ -35,16 +34,15 @@ func (svc postSvc) GetPost(id int) (model.Post, error) {
 	return post, err
 }
 
-func (svc postSvc) AddPost(p model.Post) (int64, error) {
+func (svc postSvc) AddPost(p model.Post) (int, error) {
 	query := "INSERT INTO posts (body) VALUES ($1) RETURNING id"
 	lastInsertId := 0
 	var err = database.Db.QueryRow(query, p.Body).Scan(&lastInsertId)
 	if err != nil {
-        fmt.Println(err)
 		return 0, err
 	}
 
-	return int64(lastInsertId), nil
+	return int(lastInsertId), nil
 }
 
 func (svc postSvc) UpdatePost(id int, post model.Post) error {
