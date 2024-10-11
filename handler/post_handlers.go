@@ -2,7 +2,6 @@ package handler
 
 import (
 	"encoding/json"
-	"fmt"
 	"go-server/model"
 	"go-server/service"
 	"io"
@@ -34,7 +33,9 @@ func NewPostHandler() PostHandler {
 func (h postHandler) HandleGetPosts(w http.ResponseWriter, r *http.Request) {
 	posts, err := h.postSvc.GetPosts()
 	if err != nil {
-		fmt.Println(err)
+		w.WriteHeader(http.StatusBadRequest)
+		render.JSON(w, r, render.M{"error": err})
+		return
 	}
 	render.JSON(w, r, render.M{"posts": posts, "error": err})
 }
