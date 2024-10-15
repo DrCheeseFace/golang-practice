@@ -12,16 +12,15 @@ func NewRoutes() chi.Router {
 	r := chi.NewRouter()
 	r.Use(middleware.Logger)
 
-    //allow everything
-    r.Use(cors.Handler(cors.Options{
-        AllowedOrigins:   []string{"*"},
-        AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
-        AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token"},
-        ExposedHeaders:   []string{"Link"},
-        AllowCredentials: false,
-        MaxAge:           300,
-    }))
-
+	// allow everything
+	r.Use(cors.Handler(cors.Options{
+		AllowedOrigins:   []string{"*"},
+		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token"},
+		ExposedHeaders:   []string{"Link"},
+		AllowCredentials: false,
+		MaxAge:           300,
+	}))
 
 	postHandler := handler.NewPostHandler()
 	r.Get("/", handler.HandleWelcome)

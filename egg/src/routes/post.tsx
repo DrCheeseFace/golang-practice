@@ -3,7 +3,7 @@ import EditPost from "../components/EditPost";
 import { FC, useEffect, useState } from "react";
 import { ENDPOINT, PostObj } from "../App";
 import axios from "axios";
-import { getter } from "./posts";
+import { getter } from "../lib/lib";
 
 const Post: FC = ({ }) => {
     const params = useParams();
@@ -15,7 +15,6 @@ const Post: FC = ({ }) => {
         })
         return redirect("/posts")
     }
-
 
     const fetchPost = async () => {
         try {
@@ -32,13 +31,14 @@ const Post: FC = ({ }) => {
         }
     };
 
+
     useEffect(() => {
         fetchPost();
     }, [])
     return (
         <>
             {post ? (
-                <EditPost post={post} />
+                <EditPost />
             ) : (
                 <p>loading</p>
             )}

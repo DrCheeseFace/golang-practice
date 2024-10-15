@@ -1,22 +1,8 @@
-import { FC, useEffect, useRef, useState } from "react";
+import { FC, useEffect, useState } from "react";
 import ShowPosts from "../components/ShowPosts";
-import axios from "axios";
-import { ENDPOINT, PostObj } from "../App";
+import { PostObj } from "../App";
+import { getter, poster } from "../lib/lib";
 
-const poster = async (url: string, body: string): Promise<any> => {
-    const response = await axios.post(`${ENDPOINT}/${url}`, {
-        body: body
-    })
-    return response
-}
-
-
-export const getter = async (url: string): Promise<any> => {
-    const response = await axios.get(`${ENDPOINT}/${url}`, {
-        responseType: "json"
-    })
-    return response.data
-}
 
 
 const Posts: FC = ({ }) => {
