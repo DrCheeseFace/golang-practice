@@ -1,7 +1,8 @@
+import { Link } from 'react-router-dom';
 import './App.css'
 import { FC } from 'react'
 
-export declare const Post: {
+export declare const PostObj: {
     id: number,
     body: string,
     first_created: string,
@@ -16,6 +17,7 @@ const App: FC = () => {
     return (
     <>
         <h1>Vite + React + Go </h1>
+        <Link to="posts">go to posts page</Link>
     </>
 
     )

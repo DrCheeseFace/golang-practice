@@ -1,46 +1,17 @@
-import { FC, useEffect, useState } from 'react'
-import { ENDPOINT, Post } from '../App'
-import axios from 'axios'
 
-export const getter = async (url: string): Promise<any> => {
-    const response = await axios.get(`${ENDPOINT}/${url}`, {
-        responseType: "json"
-    })
-    return response.data
+import { FC } from "react";
+import { PostObj } from "../App";
+import { Link } from "react-router-dom";
+
+interface PostsProps {
+    posts: typeof PostObj[]
 }
 
-const ShowPosts: FC = ({ }) => {
-    const [posts, setPosts] = useState<typeof Post[]>([]);
-
-    const fetchData = async () => {
-        console.log("fetch data being run")
-        try {
-            const result = await getter("posts");
-
-            let posts = []
-            for (let i = 0; i < result.posts.length; i++) {
-                let entry: typeof Post = {
-                    id: result.posts[i].id,
-                    body: result.posts[i].body,
-                    first_created: result.posts[i].first_created,
-                    last_updated: result.posts[i].last_updated
-                }
-                posts.push(entry)
-            }
-            setPosts(posts)
-
-        } catch (err) {
-            console.error(err);
-        }
-    };
-
-    useEffect(() => {
-        fetchData();
-    }, [])
+const ShowPosts: FC<PostsProps> = ({ posts }): JSX.Element => {
 
     return (
         <div>
-            {posts ? (
+            {posts.length != 0 ? (
                 <table>
                     <thead>
                         <tr>
@@ -57,6 +28,7 @@ const ShowPosts: FC = ({ }) => {
                                 <td>{post.body}</td>
                                 <td>{post.first_created}</td>
                                 <td>{post.last_updated}</td>
+                                <td><Link to={post.id.toString()}>edit post</Link></td>
                             </tr>
                         ))}
                     </tbody>
@@ -64,7 +36,6 @@ const ShowPosts: FC = ({ }) => {
             ) : (
                 <p>No posts!</p>
             )}
-            <button onClick={fetchData}> refresh posts </button>
         </div>
     );
 };

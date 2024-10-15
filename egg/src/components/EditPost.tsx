@@ -1,39 +1,12 @@
-import { FC, useEffect, useState } from "react";
-import { redirect, useParams } from "react-router-dom";
-import { getter } from "./ShowPosts";
-import { ENDPOINT, Post } from "../App";
-import axios from "axios";
+import { FC } from "react";
+import { Link } from "react-router-dom";
+import { PostObj } from "../App";
 
-const EditPost: FC = ({ }) => {
-    const params = useParams();
-    const [post, setPost] = useState<typeof Post>();
+interface PostProps {
+    post: typeof PostObj
+}
 
-    const deletePost = async () => {
-        await axios.delete(`${ENDPOINT}/posts/${params.id}`, {
-        })
-        return redirect("/posts")
-    }
-
-
-    const fetchPost = async () => {
-        try {
-            const result = await getter(`posts/${params.id}`)
-            let entry: typeof Post = {
-                id: result.post.id,
-                body: result.post.body,
-                first_created: result.post.first_created,
-                last_updated: result.post.last_updated
-            }
-            setPost(entry);
-        } catch (err) {
-            console.error(err);
-        }
-    };
-
-    useEffect(() => {
-        fetchPost();
-    }, [])
-
+const EditPost: FC<PostProps> = ({ post }): JSX.Element => {
 
     return (
         <>
@@ -45,7 +18,8 @@ const EditPost: FC = ({ }) => {
                         <li>created: {post.first_created}</li>
                         <li>last updated: {post.last_updated}</li>
                     </ul>
-                    <button onClick={deletePost}>delete post</button>
+                    <br />
+                    <Link to="../posts">back to posts</Link>
                 </div>
             ) : (
                 <p>loading post</p>
