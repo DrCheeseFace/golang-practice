@@ -9,11 +9,18 @@ const EditPost: FC = ({ }): JSX.Element => {
     const [post, setPost] = useState<typeof PostObj>();
     const [body, setBody] = useState<string>('');
 
+    const fetchData = async () => {
+        if (params.id) {
+            const postData = await fetchPost(params.id);
+            setPost(postData);
+        }
+    }
+
     const updatePost = async (body: string) => {
-        console.log(`${ENDPOINT}/posts/${params.id}`)
         await axios.put(`${ENDPOINT}/posts/${params.id}`, {
             body: body
         })
+        fetchData()
     }
 
     const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -25,12 +32,6 @@ const EditPost: FC = ({ }): JSX.Element => {
     }
 
     useEffect(() => {
-        const fetchData = async () => {
-            if (params.id) {
-                const postData = await fetchPost(params.id);
-                setPost(postData);
-            }
-        }
         fetchData()
         if (post) {
             setBody(post.body)
