@@ -46,7 +46,7 @@ func (svc postSvc) AddPost(p model.Post) (int, error) {
 }
 
 func (svc postSvc) UpdatePost(id int, post model.Post) error {
-	res, err := database.Db.NamedExec("UPDATE posts SET body=:body, lastupdated=:lastupdated WHERE id=:id", post)
+	res, err := database.Db.NamedExec("UPDATE posts SET body=:body, lastupdated=CURRENT_TIMESTAMP WHERE id=:id", post)
 	if err != nil {
 		return err
 	}
