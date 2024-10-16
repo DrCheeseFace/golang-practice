@@ -11,6 +11,7 @@
 ### Frontend 
  - ts 
  - react 
+ - mobx 
  - mui-ui
  - vite 
 
