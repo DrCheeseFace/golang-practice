@@ -1,6 +1,6 @@
 # Go + React practice
 ## Teh tech
-### backend
+### Backend
  - golang
  - sqlx
  - go-chi 
@@ -8,11 +8,28 @@
  - flyway 
 
 
-### frontend 
+### Frontend 
  - ts 
- - vite 
  - react 
+ - mui ui library (not yet commited)
+ - vite 
 
+## Dev-ing
+
+get a postgres container running
+```
+docker run -d --name postgres -p 5432:5432 -e POSTGRES_PASSWORD=password postgres
+```
+
+run the go server
+```bash
+go run main.go
+```
+run front end (yeah i named it egg)
+```bash
+cd egg
+npm run dev
+```
 
 
  ### todo
