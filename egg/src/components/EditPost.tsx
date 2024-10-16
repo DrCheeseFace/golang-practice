@@ -36,7 +36,6 @@ const EditPost: FC = ({ }): JSX.Element => {
         if (post) {
             setBody(post.body)
         }
-        console.log(body)
     }, [params.id])
 
 

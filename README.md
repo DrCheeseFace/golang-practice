@@ -11,7 +11,7 @@
 ### Frontend 
  - ts 
  - react 
- - mui ui library (not yet commited)
+ - mui-ui
  - vite 
 
 ## Dev-ing

@@ -2,15 +2,25 @@ import { FC, useEffect, useState } from "react";
 import ShowPosts from "../components/ShowPosts";
 import { PostObj } from "../App";
 import { getter, poster } from "../lib/lib";
+import { useNavigate } from "react-router-dom";
+
+import Button from '@mui/material/Button'
+import Box from '@mui/material/Box';
+import Drawer from '@mui/material/Drawer';
+import List from '@mui/material/List';
+import ListItem from '@mui/material/ListItem';
+import ListItemButton from '@mui/material/ListItemButton';
+
 
 
 
 const Posts: FC = ({ }) => {
-    const [body, setBody] = useState<string>("")
+    const [open, setOpen] = useState(false)
+    const [body, setBody] = useState<string>("");
     const [posts, setPosts] = useState<typeof PostObj[]>([]);
+    let navigate = useNavigate();
 
     const fetchData = async () => {
-        console.log("fetch data being run")
         try {
             const result = await getter("posts");
 
@@ -39,6 +49,9 @@ const Posts: FC = ({ }) => {
         await poster("posts", body)
         fetchData()
     }
+    const toggleDrawer = (newOpen: boolean) => () => {
+        setOpen(newOpen);
+    }
 
     useEffect(() => {
         fetchData();
@@ -46,9 +59,24 @@ const Posts: FC = ({ }) => {
 
     return (
         <>
+            <div>
+                <Button onClick={toggleDrawer(true)}>open mui navigation bar</Button>
+                <Drawer open={open} onClose={toggleDrawer(false)}>
+                    <Box sx={{ width: 250 }} role="presentation" onClick={toggleDrawer(false)}>
+                        <List>
+                            <ListItem disablePadding>
+                                <ListItemButton>
+                                    <Button type="submit" variant="contained" onClick={() => { navigate("/", { replace: true }) }}>go to home</Button>
+                                </ListItemButton>
+                            </ListItem>
+                        </List>
+                    </Box>
+                </Drawer>
+
+            </div>
             <div className="card submitpost">
-                <input type="text" value={body} onChange={handleInputChange} placeholder="Enter post" />
-                <button type="submit" onClick={handleSubmit}>submit post</button>
+                <input type="text" value={body} onChange={handleInputChange} placeholder="type body here" />
+                <Button type="submit" variant="outlined" onClick={handleSubmit}>submit post</Button>
             </div>
             <div className="card showposts">
                 <ShowPosts posts={posts} />
@@ -57,3 +85,4 @@ const Posts: FC = ({ }) => {
     );
 }
 export default Posts
+
