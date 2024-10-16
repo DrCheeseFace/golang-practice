@@ -16,8 +16,7 @@ import ListItemButton from '@mui/material/ListItemButton';
 const Post: FC = ({ }) => {
     let navigate = useNavigate();
     const params = useParams();
-    const [post, setPost] = useState<typeof PostObj>();
-    const [open, setOpen] = useState<boolean>(false);
+    const [post, setPost] = useState<PostObj>();
 
     const fetchData = async () => {
         if (params.id) {
@@ -32,10 +31,6 @@ const Post: FC = ({ }) => {
         navigate("/posts", { replace: true })
     }
 
-    const toggleDrawer = (newOpen: boolean) => () => {
-        setOpen(newOpen)
-    }
-
     useEffect(() => {
         fetchData()
         if (post) {
@@ -46,8 +41,7 @@ const Post: FC = ({ }) => {
 
     return (
         <>
-            <Button onClick={toggleDrawer(true)}>open mui navigation bar</Button>
-            <Drawer open={open} onClose={toggleDrawer(false)} variant="permanent" sx={{
+            <Drawer variant="permanent" sx={{
                 width: 200,
                 flexShrink: 0,
                 '& .MuiDrawer-paper': {
@@ -55,7 +49,7 @@ const Post: FC = ({ }) => {
                     boxSizing: 'border-box',
                 },
             }}>
-                <Box sx={{ width: 200 }} role="presentation" onClick={toggleDrawer(false)}>
+                <Box sx={{ width: 200 }} role="presentation" >
                     <List>
                         <ListItem disablePadding>
                             <ListItemButton>

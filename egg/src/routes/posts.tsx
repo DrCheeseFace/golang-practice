@@ -17,7 +17,7 @@ import ListItemButton from '@mui/material/ListItemButton';
 const Posts: FC = ({ }) => {
     const [open, setOpen] = useState(false)
     const [body, setBody] = useState<string>("");
-    const [posts, setPosts] = useState<typeof PostObj[]>([]);
+    const [posts, setPosts] = useState<PostObj[]>([]);
     let navigate = useNavigate();
 
     const fetchData = async () => {
@@ -26,12 +26,10 @@ const Posts: FC = ({ }) => {
 
             let postsToSet = []
             for (let i = 0; i < result.posts.length; i++) {
-                let entry: typeof PostObj = {
-                    id: result.posts[i].id,
-                    body: result.posts[i].body,
-                    first_created: result.posts[i].first_created,
-                    last_updated: result.posts[i].last_updated
-                }
+                let entry = new PostObj(result.posts[i].id,
+                    result.posts[i].body,
+                    result.posts[i].first_created,
+                    result.posts[i].last_updated)
                 postsToSet.push(entry)
             }
             setPosts(postsToSet)

@@ -1,18 +1,18 @@
 import { FC, useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { ENDPOINT, PostObj } from "../App";
-import { fetchPost } from "../lib/lib";
 import axios from "axios";
+import { fetchPost } from "../lib/lib";
 
 const EditPost: FC = ({ }): JSX.Element => {
     const params = useParams();
-    const [post, setPost] = useState<typeof PostObj>();
+    const [post, setPost] = useState<PostObj>();
     const [body, setBody] = useState<string>('');
 
     const fetchData = async () => {
         if (params.id) {
             const postData = await fetchPost(params.id);
-            setPost(postData);
+                setPost(postData);
         }
     }
 

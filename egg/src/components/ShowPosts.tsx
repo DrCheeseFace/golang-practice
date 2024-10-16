@@ -1,6 +1,7 @@
 import { FC } from "react";
 import { PostObj } from "../App";
 import { Link } from "react-router-dom";
+import "../style/ShowPosts.css"
 
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -11,7 +12,7 @@ import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 
 interface PostsProps {
-    posts: typeof PostObj[]
+    posts: PostObj[]
 }
 
 const ShowPosts: FC<PostsProps> = ({ posts }): JSX.Element => {
@@ -31,7 +32,7 @@ const ShowPosts: FC<PostsProps> = ({ posts }): JSX.Element => {
                         </TableHead>
                         <TableBody>
                             {posts.map(post => (
-                                <TableRow key={post.id}>
+                                <TableRow key={post.id} hover>
                                     <TableCell>{post.id}</TableCell>
                                     <TableCell>{post.body}</TableCell>
                                     <TableCell>{post.first_created}</TableCell>

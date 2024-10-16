@@ -1,4 +1,4 @@
-import './index.css'
+import './style/index.css'
 import Posts from "./routes/posts"
 import Post from "./routes/post"
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
@@ -7,20 +7,18 @@ import * as ReactDOM from "react-dom/client"
 import App from './App'
 
 
-
-
 const router = createBrowserRouter([
     {
         path: "/",
-        element: <App/>,
+        element: <App />,
     },
     {
         path: "posts",
-        element: <Posts/>,
+        element: <Posts />,
     },
     {
         path: "posts/:id",
-        element: <Post/>,
+        element: <Post />,
     },
 ]);
 
