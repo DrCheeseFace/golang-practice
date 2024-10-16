@@ -1,5 +1,6 @@
 import axios from "axios"
-import { ENDPOINT, PostObj } from "../App"
+import { ENDPOINT } from "../App"
+import { PostObj } from "./post"
 
 export const poster = async (url: string, body: string): Promise<any> => {
     const response = await axios.post(`${ENDPOINT}/${url}`, {
@@ -28,3 +29,4 @@ export const fetchPost = async (id: string | undefined) => {
         console.error(err);
     }
 };
+

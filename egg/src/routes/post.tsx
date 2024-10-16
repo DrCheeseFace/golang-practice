@@ -1,7 +1,7 @@
 import { useNavigate, useParams } from "react-router-dom";
 import { FC, useEffect, useState } from "react";
-import { ENDPOINT, PostObj } from "../App";
-import { fetchPost } from "../lib/lib";
+import { ENDPOINT} from "../App";
+import { fetchPost } from "../lib/crud";
 import EditPost from "../components/EditPost";
 import axios from "axios";
 
@@ -11,6 +11,7 @@ import Drawer from '@mui/material/Drawer';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemButton from '@mui/material/ListItemButton';
+import { PostObj } from "../lib/post";
 
 
 const Post: FC = ({ }) => {

@@ -1,8 +1,8 @@
 import { FC, useEffect, useState } from "react";
 import ShowPosts from "../components/ShowPosts";
-import { PostObj } from "../App";
-import { getter, poster } from "../lib/lib";
+import { getter, poster } from "../lib/crud";
 import { useNavigate } from "react-router-dom";
+import { PostObj } from "../lib/post";
 
 import Button from '@mui/material/Button'
 import Box from '@mui/material/Box';
@@ -10,9 +10,6 @@ import Drawer from '@mui/material/Drawer';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemButton from '@mui/material/ListItemButton';
-
-
-
 
 const Posts: FC = ({ }) => {
     const [open, setOpen] = useState(false)
@@ -33,7 +30,6 @@ const Posts: FC = ({ }) => {
                 postsToSet.push(entry)
             }
             setPosts(postsToSet)
-
         } catch (err) {
             console.error(err);
         }
@@ -42,11 +38,13 @@ const Posts: FC = ({ }) => {
     const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setBody(event.target.value);
     }
+
     const handleSubmit = async (event: React.FormEvent) => {
         event.preventDefault();
         await poster("posts", body)
         fetchData()
     }
+
     const toggleDrawer = (newOpen: boolean) => () => {
         setOpen(newOpen);
     }

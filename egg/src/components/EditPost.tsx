@@ -1,8 +1,9 @@
 import { FC, useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
-import { ENDPOINT, PostObj } from "../App";
+import { ENDPOINT } from "../App";
 import axios from "axios";
-import { fetchPost } from "../lib/lib";
+import { fetchPost } from "../lib/crud";
+import { PostObj } from "../lib/post";
 
 const EditPost: FC = ({ }): JSX.Element => {
     const params = useParams();
@@ -12,7 +13,7 @@ const EditPost: FC = ({ }): JSX.Element => {
     const fetchData = async () => {
         if (params.id) {
             const postData = await fetchPost(params.id);
-                setPost(postData);
+            setPost(postData);
         }
     }
 

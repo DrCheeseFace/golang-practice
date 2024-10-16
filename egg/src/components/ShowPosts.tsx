@@ -1,8 +1,7 @@
 import { FC } from "react";
-import { PostObj } from "../App";
 import { Link } from "react-router-dom";
+import { PostObj } from "../lib/post";
 import "../style/ShowPosts.css"
-
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
@@ -16,6 +15,7 @@ interface PostsProps {
 }
 
 const ShowPosts: FC<PostsProps> = ({ posts }): JSX.Element => {
+
 
     return (
         <div>
@@ -31,7 +31,7 @@ const ShowPosts: FC<PostsProps> = ({ posts }): JSX.Element => {
                             </TableRow>
                         </TableHead>
                         <TableBody>
-                            {posts.map(post => (
+                            {posts.map((post: PostObj) => (
                                 <TableRow key={post.id} hover>
                                     <TableCell>{post.id}</TableCell>
                                     <TableCell>{post.body}</TableCell>
@@ -49,4 +49,4 @@ const ShowPosts: FC<PostsProps> = ({ posts }): JSX.Element => {
         </div>
     );
 };
-export default ShowPosts
+export default ShowPosts;
