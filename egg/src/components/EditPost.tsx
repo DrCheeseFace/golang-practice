@@ -2,18 +2,20 @@ import { FC, useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { ENDPOINT } from "../App";
 import axios from "axios";
-import { fetchPost } from "../lib/crud";
 import { PostObj } from "../lib/post";
+import { postsStore } from "../routes/posts";
+import { getter } from "../lib/crud";
 
 const EditPost: FC = ({ }): JSX.Element => {
     const params = useParams();
-    const [post, setPost] = useState<PostObj>();
+    const [post, setPost] = useState<PostObj>(new PostObj());
     const [body, setBody] = useState<string>('');
 
     const fetchData = async () => {
         if (params.id) {
-            const postData = await fetchPost(params.id);
-            setPost(postData);
+            let id: number = +params.id
+            let postToSet = postsStore.getPost(id)
+            setPost(postToSet);
         }
     }
 
@@ -21,7 +23,12 @@ const EditPost: FC = ({ }): JSX.Element => {
         await axios.put(`${ENDPOINT}/posts/${params.id}`, {
             body: body
         })
-        fetchData()
+        if (params.id) {
+            let id: number = +params.id
+            let response = await getter("posts/" + params.id)
+            setPost(response.post)
+            postsStore.updatePost(id, body, response.post.last_updated)
+        }
     }
 
     const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -33,11 +40,8 @@ const EditPost: FC = ({ }): JSX.Element => {
     }
 
     useEffect(() => {
-        fetchData()
-        if (post) {
-            setBody(post.body)
-        }
-    }, [params.id])
+        fetchData();
+    }, []);
 
 
     return (

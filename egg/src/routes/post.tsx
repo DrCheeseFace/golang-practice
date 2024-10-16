@@ -1,9 +1,10 @@
 import { useNavigate, useParams } from "react-router-dom";
 import { FC, useEffect, useState } from "react";
-import { ENDPOINT} from "../App";
-import { fetchPost } from "../lib/crud";
+import { ENDPOINT } from "../App";
 import EditPost from "../components/EditPost";
 import axios from "axios";
+import { PostObj } from "../lib/post";
+import { postsStore } from "./posts";
 
 import Button from '@mui/material/Button'
 import Box from '@mui/material/Box';
@@ -11,7 +12,6 @@ import Drawer from '@mui/material/Drawer';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemButton from '@mui/material/ListItemButton';
-import { PostObj } from "../lib/post";
 
 
 const Post: FC = ({ }) => {
@@ -21,22 +21,24 @@ const Post: FC = ({ }) => {
 
     const fetchData = async () => {
         if (params.id) {
-            const postData = await fetchPost(params.id);
-            setPost(postData);
+            let id: number = +params.id
+            var fetchedPost = postsStore.getPost(id)
+            setPost(fetchedPost)
         }
     }
 
     const deletePost = async () => {
-        await axios.delete(`${ENDPOINT}/posts/${params.id}`, {
-        })
-        navigate("/posts", { replace: true })
+        if (params.id) {
+            await axios.delete(`${ENDPOINT}/posts/${params.id}`, {
+            })
+            let id: number = +params.id
+            postsStore.deletePost(id)
+            navigate("/posts", { replace: true })
+        }
     }
 
     useEffect(() => {
         fetchData()
-        if (post) {
-            setPost(post)
-        }
     }, [])
 
 

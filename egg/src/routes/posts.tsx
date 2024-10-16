@@ -3,6 +3,7 @@ import ShowPosts from "../components/ShowPosts";
 import { getter, poster } from "../lib/crud";
 import { useNavigate } from "react-router-dom";
 import { PostObj } from "../lib/post";
+import { PostsStore } from "../lib/store";
 
 import Button from '@mui/material/Button'
 import Box from '@mui/material/Box';
@@ -11,7 +12,10 @@ import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemButton from '@mui/material/ListItemButton';
 
+export const postsStore = new PostsStore();
+
 const Posts: FC = ({ }) => {
+
     const [open, setOpen] = useState(false)
     const [body, setBody] = useState<string>("");
     const [posts, setPosts] = useState<PostObj[]>([]);
@@ -30,6 +34,7 @@ const Posts: FC = ({ }) => {
                 postsToSet.push(entry)
             }
             setPosts(postsToSet)
+            postsStore.init(postsToSet)
         } catch (err) {
             console.error(err);
         }

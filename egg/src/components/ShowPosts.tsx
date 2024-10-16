@@ -16,7 +16,6 @@ interface PostsProps {
 
 const ShowPosts: FC<PostsProps> = ({ posts }): JSX.Element => {
 
-
     return (
         <div>
             {posts.length != 0 ? (

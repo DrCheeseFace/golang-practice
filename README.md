@@ -11,7 +11,7 @@
 ### Frontend 
  - ts 
  - react 
- - mobx (not yet working)
+ - mobx 
  - mui-ui
  - vite 
 

@@ -22,9 +22,10 @@ export class PostsStore {
         this.posts.push(post);
     }
 
-    updatePost(id: number, body: string) {
+    updatePost(id: number, body: string, lastupdated: string) {
         var postIndex = this.posts.map(function(x) { return x.id }).indexOf(id);
         this.posts[postIndex].body = body
+        this.posts[postIndex].last_updated = lastupdated
     }
 
     getPost(id: number) {
@@ -36,14 +37,15 @@ export class PostsStore {
         return this.posts
     }
 
-
     deletePost(id: number) {
         var postIndex = this.posts.map(function(x) { return x.id }).indexOf(id);
         this.posts.splice(postIndex);
     }
+
     get storeDetails() {
         let out = 'post ids: '
         this.posts.forEach(post => out = out + post.id + ',')
         return out
     }
+
 }

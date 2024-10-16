@@ -9,13 +9,13 @@ export const poster = async (url: string, body: string): Promise<any> => {
     return response
 }
 
-
 export const getter = async (url: string): Promise<any> => {
     const response = await axios.get(`${ENDPOINT}/${url}`, {
         responseType: "json"
     })
     return response.data
 }
+
 export const fetchPost = async (id: string | undefined) => {
     //TODO find a better way of doing this ^
     try {
