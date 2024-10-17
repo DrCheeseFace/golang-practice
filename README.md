@@ -26,9 +26,9 @@ run the go server
 ```bash
 go run main.go
 ```
-run front end (yeah i named it egg)
+run front end 
 ```bash
-cd egg
+cd frontend 
 npm run dev
 ```
 
