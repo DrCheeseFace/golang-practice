@@ -12,6 +12,7 @@ export class PostsStore {
             getPost: action,
             getPosts: action,
             deletePost: action,
+            postExists: action,
         })
     }
 
@@ -28,10 +29,20 @@ export class PostsStore {
         this.posts[postIndex].last_updated = lastupdated
     }
 
-    getPost(id: number) {
+    getPost(id: number): PostObj {
         var postIndex = this.posts.map(function(x) { return x.id }).indexOf(id);
         return this.posts[postIndex]
     }
+
+    postExists(id: number) {
+        for (let i of this.posts) {
+            if (i.id == id) {
+                return true
+            }
+        }
+        return false
+    }
+
 
     getPosts() {
         return this.posts

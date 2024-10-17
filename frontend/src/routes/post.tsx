@@ -3,7 +3,6 @@ import { FC, useEffect, useState } from "react";
 import { ENDPOINT } from "../App";
 import EditPost from "../components/EditPost";
 import axios from "axios";
-import { PostObj } from "../lib/post";
 import { postsStore } from "./posts";
 
 import Button from '@mui/material/Button'
@@ -12,18 +11,25 @@ import Drawer from '@mui/material/Drawer';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemButton from '@mui/material/ListItemButton';
+import { getter } from "../lib/crud";
 
 
 const Post: FC = ({ }) => {
     let navigate = useNavigate();
     const params = useParams();
-    const [post, setPost] = useState<PostObj>();
+    const [postExists, setPostExists] = useState<boolean>(false);
 
     const fetchData = async () => {
         if (params.id) {
-            let id: number = +params.id
-            var fetchedPost = postsStore.getPost(id)
-            setPost(fetchedPost)
+            let id: number = +params.id;
+            let exists = postsStore.postExists(id);
+            setPostExists(exists);
+            if (!exists) {
+                const { post } = await getter("posts/" + id);
+                if (post) {
+                    setPostExists(true);
+                }
+            }
         }
     }
 
@@ -64,7 +70,7 @@ const Post: FC = ({ }) => {
                 </Box>
             </Drawer>
 
-            {post ? (
+            {postExists ? (
                 <EditPost />
             ) : (
                 <p>loading</p>
