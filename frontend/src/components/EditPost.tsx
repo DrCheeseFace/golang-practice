@@ -16,7 +16,7 @@ const EditPost: FC = ({ }): JSX.Element => {
             let id: number = +params.id
             let postToSet = postsStore.getPost(id)
             if (!postToSet) {
-                let postData = (await getter("posts/"+ id)).post
+                let postData = (await getter("posts/" + id)).post
                 postToSet = new PostObj(postData.id, postData.body, postData.first_created, postData.last_updated)
             }
             setPost(postToSet);

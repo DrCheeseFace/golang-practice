@@ -15,7 +15,6 @@ import ListItemButton from '@mui/material/ListItemButton';
 export const postsStore = new PostsStore();
 
 const Posts: FC = ({ }) => {
-
     const [open, setOpen] = useState(false)
     const [body, setBody] = useState<string>("");
     const [posts, setPosts] = useState<PostObj[]>([]);
@@ -24,7 +23,6 @@ const Posts: FC = ({ }) => {
     const fetchData = async () => {
         try {
             const result = await getter("posts");
-
             let postsToSet = []
             for (let i = 0; i < result.posts.length; i++) {
                 let entry = new PostObj(result.posts[i].id,

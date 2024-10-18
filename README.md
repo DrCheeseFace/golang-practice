@@ -40,6 +40,7 @@ npm run dev
 - [x] implement POST
 - [x] implement PUT
 - [x] implement DELETE
+- [ ] save postsState to persist after refreshes 
 - [ ] make it look good 
 
 ![funny gif](https://jollycontrarian.com/images/a/ab/Dramatic_Look_Gopher.gif) 

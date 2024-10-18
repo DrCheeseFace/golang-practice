@@ -25,7 +25,7 @@ const Post: FC = ({ }) => {
             let exists = postsStore.postExists(id);
             setPostExists(exists);
             if (!exists) {
-                const { post } = await getter("posts/" + id);
+                const post = await getter("posts/" + id);
                 if (post) {
                     setPostExists(true);
                 }
