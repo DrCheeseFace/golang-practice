@@ -3,7 +3,8 @@ import ShowPosts from "../components/ShowPosts";
 import { getter, poster } from "../lib/crud";
 import { useNavigate } from "react-router-dom";
 import { PostObj } from "../lib/post";
-import { PostsStore } from "../lib/store";
+import postsStore from "../lib/store";
+import { observer } from "mobx-react";
 
 import Button from '@mui/material/Button'
 import Box from '@mui/material/Box';
@@ -12,12 +13,9 @@ import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemButton from '@mui/material/ListItemButton';
 
-export const postsStore = new PostsStore();
-
-const Posts: FC = ({ }) => {
+const Posts: FC = () => {
     const [open, setOpen] = useState(false)
     const [body, setBody] = useState<string>("");
-    const [posts, setPosts] = useState<PostObj[]>([]);
     let navigate = useNavigate();
 
     const fetchData = async () => {
@@ -31,7 +29,6 @@ const Posts: FC = ({ }) => {
                     result.posts[i].last_updated)
                 postsToSet.push(entry)
             }
-            setPosts(postsToSet)
             postsStore.init(postsToSet)
         } catch (err) {
             console.error(err);
@@ -78,10 +75,11 @@ const Posts: FC = ({ }) => {
                 <Button type="submit" variant="outlined" onClick={handleSubmit}>submit post</Button>
             </div>
             <div className="card showposts">
-                <ShowPosts posts={posts} />
+                <ShowPosts posts={postsStore.posts} />
             </div>
         </>
     );
 }
-export default Posts
+
+export default observer(Posts);
 

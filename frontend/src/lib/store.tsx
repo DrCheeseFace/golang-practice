@@ -1,7 +1,7 @@
 import { PostObj } from "./post";
 import { action, makeObservable, observable } from "mobx";
 
-export class PostsStore {
+class PostsStore {
     posts: PostObj[] = [];
 
     constructor() {
@@ -10,9 +10,9 @@ export class PostsStore {
             addPost: action,
             updatePost: action,
             getPost: action,
-            getPosts: action,
             deletePost: action,
             postExists: action,
+            init: action, 
         })
     }
 
@@ -44,10 +44,6 @@ export class PostsStore {
     }
 
 
-    getPosts() {
-        return this.posts
-    }
-
     deletePost(id: number) {
         var postIndex = this.posts.map(function(x) { return x.id }).indexOf(id);
         this.posts.splice(postIndex);
@@ -60,3 +56,5 @@ export class PostsStore {
     }
 
 }
+const postsStore = new PostsStore();
+export default postsStore;

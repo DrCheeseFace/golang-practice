@@ -3,10 +3,11 @@ import { Link, useParams } from "react-router-dom";
 import { ENDPOINT } from "../App";
 import axios from "axios";
 import { PostObj } from "../lib/post";
-import { postsStore } from "../routes/posts";
 import { getter } from "../lib/crud";
+import { observer } from "mobx-react";
+import postsStore from "../lib/store";
 
-const EditPost: FC = ({ }): JSX.Element => {
+const EditPost: FC = observer((): JSX.Element => {
     const params = useParams();
     const [post, setPost] = useState<PostObj>(new PostObj());
     const [body, setBody] = useState<string>('');
@@ -29,9 +30,8 @@ const EditPost: FC = ({ }): JSX.Element => {
         })
         if (params.id) {
             let id: number = +params.id
-            let response = await getter("posts/" + params.id)
+            let response = await getter("posts/" + id)
             setPost(response.post)
-            postsStore.updatePost(id, body, response.post.last_updated)
         }
     }
 
@@ -70,5 +70,5 @@ const EditPost: FC = ({ }): JSX.Element => {
             )}
         </>
     )
-};
+});
 export default EditPost

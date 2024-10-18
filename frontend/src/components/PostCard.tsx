@@ -1,38 +1,14 @@
 import { Card, CardContent, Typography } from "@mui/material";
-import { FC, useEffect, useState } from "react";
+import { FC } from "react";
 import { PostObj } from "../lib/post";
-import { postsStore } from "../routes/posts";
-import { getter } from "../lib/crud";
 
 
 interface PostsProps {
-    id: number
+    post: PostObj;
 }
 
-const PostCard: FC<PostsProps> = ({ id }) => {
-    const [post, setPost] = useState<PostObj>()
+const PostCard: FC<PostsProps> = ({ post }) => {
 
-    const fetchData = async () => {
-        try {
-            const result = await getter("posts/" + id);
-            let entry = new PostObj(result.post.id,
-                result.post.body,
-                result.post.first_created,
-                result.post.last_updated)
-            postsStore.addPost(entry)
-            setPost(entry)
-        } catch (err) {
-            console.error("error: ", err);
-        }
-    };
-
-    useEffect(() => {
-        if (postsStore.getPosts().length == 0 && id) {
-            fetchData();
-        }
-        setPost(postsStore.getPost(id))
-    }, [id])
-    
     return (
         <div>
             {post ? (
@@ -53,7 +29,7 @@ const PostCard: FC<PostsProps> = ({ id }) => {
                     </CardContent>
                 </Card>
             ) : (
-            <p>loading</p>
+                <p>loading</p>
             )}
         </div>
     );
