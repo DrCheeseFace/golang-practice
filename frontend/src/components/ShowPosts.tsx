@@ -17,7 +17,7 @@ interface PostsProps {
     posts: PostObj[]
 }
 
-const ShowPosts: FC<PostsProps> = ({ posts }): JSX.Element => {
+const ShowPosts: FC<PostsProps> = observer(({ posts }): JSX.Element => {
     const [selectedPost, setSelectedPost] = useState<PostObj>()
 
     const selectPost = (id: number) => () => {
@@ -54,7 +54,7 @@ const ShowPosts: FC<PostsProps> = ({ posts }): JSX.Element => {
                                     <TableCell>{post.first_created}</TableCell>
                                     <TableCell>{post.last_updated}</TableCell>
                                     <TableCell><Link to={(post.id).toString()}>edit post</Link></TableCell>
-                                    <TableCell onClick={selectPost(post.id)} >show in card</TableCell>
+                                    <TableCell id="showcard" onClick={selectPost(post.id)} >show in card</TableCell>
                                 </TableRow>
                             ))}
                         </TableBody>
@@ -65,5 +65,5 @@ const ShowPosts: FC<PostsProps> = ({ posts }): JSX.Element => {
             )}
         </div>
     );
-};
-export default observer(ShowPosts);
+});
+export default ShowPosts;
