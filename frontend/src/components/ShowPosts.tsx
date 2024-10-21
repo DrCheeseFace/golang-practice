@@ -47,13 +47,13 @@ const ShowPosts: FC<PostsProps> = observer(({ posts }): JSX.Element => {
                             </TableRow>
                         </TableHead>
                         <TableBody>
-                            {posts.map((post: PostObj) => (
-                                <TableRow key={post.id} hover>
+                            {posts.map((post: PostObj, index: number) => (
+                                <TableRow key={index} hover>
                                     <TableCell>{post.id}</TableCell>
                                     <TableCell>{post.body}</TableCell>
                                     <TableCell>{post.first_created}</TableCell>
                                     <TableCell>{post.last_updated}</TableCell>
-                                    <TableCell><Link to={(post.id).toString()}>edit post</Link></TableCell>
+                                    <TableCell> <Link to={`${post.id}`}>edit post</Link> </TableCell>
                                     <TableCell id="showcard" onClick={selectPost(post.id)} >show in card</TableCell>
                                 </TableRow>
                             ))}
