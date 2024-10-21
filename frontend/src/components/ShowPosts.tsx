@@ -47,7 +47,7 @@ const ShowPosts: FC<PostsProps> = observer(({ posts }): JSX.Element => {
                         </TableHead>
                         <TableBody>
                             {posts.map((post: PostObj, index: number) => (
-                                <TableRow key={index} hover onClick={selectPost(post.id)}>
+                                <TableRow key={index} hover onClick={selectPost(post.id)} style={{ backgroundColor: post == selectedPost ? 'lightcyan' : '' }}>
                                     <TableCell>{post.id}</TableCell>
                                     <TableCell>{post.body}</TableCell>
                                     <TableCell>{post.first_created}</TableCell>
