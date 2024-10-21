@@ -4,7 +4,6 @@ import { PostObj } from "../lib/post";
 import { observer } from "mobx-react";
 import PostCard from "./PostCard"
 
-import "../style/ShowPosts.css"
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
@@ -33,7 +32,7 @@ const ShowPosts: FC<PostsProps> = observer(({ posts }): JSX.Element => {
             {selectedPost ? (
                 <PostCard post={selectedPost} />
             ) : (
-                <p>select a card</p>
+                <p>select a post</p>
             )}
             {posts.length != 0 ? (
                 <TableContainer component={Paper}>
@@ -48,13 +47,12 @@ const ShowPosts: FC<PostsProps> = observer(({ posts }): JSX.Element => {
                         </TableHead>
                         <TableBody>
                             {posts.map((post: PostObj, index: number) => (
-                                <TableRow key={index} hover>
+                                <TableRow key={index} hover onClick={selectPost(post.id)}>
                                     <TableCell>{post.id}</TableCell>
                                     <TableCell>{post.body}</TableCell>
                                     <TableCell>{post.first_created}</TableCell>
                                     <TableCell>{post.last_updated}</TableCell>
                                     <TableCell> <Link to={`${post.id}`}>edit post</Link> </TableCell>
-                                    <TableCell id="showcard" onClick={selectPost(post.id)} >show in card</TableCell>
                                 </TableRow>
                             ))}
                         </TableBody>
