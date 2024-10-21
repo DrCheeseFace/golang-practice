@@ -1,9 +1,10 @@
 import { FC, useState } from "react";
 import { Link } from "react-router-dom";
 import { PostObj } from "../lib/post";
-import "../style/ShowPosts.css"
+import { observer } from "mobx-react";
 import PostCard from "./PostCard"
 
+import "../style/ShowPosts.css"
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
@@ -11,7 +12,6 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
-import { observer } from "mobx-react";
 
 interface PostsProps {
     posts: PostObj[]
